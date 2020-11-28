@@ -24,11 +24,16 @@ object Main extends cask.MainRoutes {
   }
 
   // For when I send a message to the bot in Telegram
-  @cask.post(path="/receive")
+  @cask.route(path="/receive", methods = Seq("get", "post"))
   def receive_from_telegram(request: cask.Request): Int = {
-    val parsed_message = receive_message(request.text)
-    val response: Int = process_message(parsed_message.text)
-    response
+    if (request.exchange.getRequestMethod.equalToString("post")) {
+      val parsed_message = receive_message(request.text)
+      val response: Int = process_message(parsed_message.text)
+      response
+    }
+    else {
+        200
+      }
   }
 
   // For when I want to make the bot send a message
