@@ -16,6 +16,7 @@ object Main extends cask.MainRoutes {
   // heroku dynamically assigns a port
   // https://stackoverflow.com/questions/15693192/
   override def port: Int = scala.util.Properties.envOrElse("PORT", "8080").toInt
+  override def host: String = "0.0.0.0"
 
   @cask.get(path="/")
   def hello(): String = {
