@@ -1,43 +1,45 @@
 package io.github.leokavanagh.cara
 
-import sys._
-import requests._
-
-
 object Cara {
 
   // the bot and chat ID shouldn't really be linked but I'm the only user so whatever
-  case class Telegram(bot_token: String, chat_id: String)
-  case class ReceivedMessage(text: String, chat_id: String)
+  case class Telegram(base_url: String, bot_token: String, chat_id: Int)
+  case class ParsedMessage(text: String, chat_id: String)
 
   def send_text(message_text: String)(implicit telegram: Telegram): Int = {
-    val bot_token = telegram.bot_token
-    val telegram_url: String = s"https://api.telegram.org/bot$bot_token"
+    val telegram_url: String = s"${telegram.base_url}${telegram.bot_token}"
+
+    // used to be Map[String, String] but chat_id is numeric.
+    // Maybe it's better to treat it as an int?
     val msg_data: Map[String, String] = Map(
       "text" -> message_text,
-      "chat_id" -> telegram.chat_id
+      "chat_id" -> telegram.chat_id.toString
     )
     val url: String = telegram_url + "/sendMessage"
     val response = requests.post(url, data=msg_data)
     response.statusCode
   }
 
+  def receive_message(request_text: String): ParsedMessage = {
+    val uj_msg = ujson.read(request_text)("message")
+    // only doing this because I know what fields I want
 
-  // TODO: Types and all that
-  def receive_message(raw_msg: Map[String, Map[String, String]]): ReceivedMessage = {
-    val msg_content: Map[String, String] = raw_msg("message")
-    val parsed_msg = ReceivedMessage(msg_content("text"), msg_content("id"))
+    val msg_map: Map[String, String] = Map(
+      "text" -> uj_msg("text").value.toString,
+      "id" -> uj_msg("chat")("id").toString
+    )
+    val parsed_msg = ParsedMessage(msg_map("text"), msg_map("id"))
     parsed_msg
   }
 
-  def process_message(msg: String) = {
+  def process_message(msg: String)(implicit telegram: Telegram): Int = {
     val first_word = msg.split(" ")(0).toLowerCase()
 
     first_word match {
-      case "weather" => println("call dublin-forecast")
-      case "read" => println("call article-reader")
-      case "remind" => Thread.sleep(1000); println(msg)
-      case _ => println("I can't do that yet. This is if-statement AI")
+      case "weather" => send_text("call dublin-forecast")
+      case "read" => send_text("call article-reader")
+      case "remind" => Thread.sleep(1000); send_text(msg)
+      case _ => send_text(s"I can't do ${first_word} yet. This is if-statement AI")
     }
   }
 
