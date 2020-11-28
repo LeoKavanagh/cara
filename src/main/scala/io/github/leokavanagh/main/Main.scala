@@ -13,7 +13,9 @@ object Main extends cask.MainRoutes {
 
   implicit val tel: Telegram = Telegram(base_url, bot_token, chat_id)
 
-  override def port: Int = 5000
+  // heroku dynamically assigns a port
+  // https://stackoverflow.com/questions/15693192/
+  override def port: Int = scala.util.Properties.envOrElse("PORT", "8080").toInt
 
   @cask.get(path="/")
   def hello(): String = {
