@@ -24,16 +24,11 @@ object Main extends cask.MainRoutes {
   }
 
   // For when I send a message to the bot in Telegram
-  @cask.route(path="/receive", methods = Seq("get", "post"))
+  @cask.post(path="/receive")
   def receive_from_telegram(request: cask.Request): Int = {
-    if (request.exchange.getRequestMethod.equalToString("post")) {
-      val parsed_message = receive_message(request.text)
-      val response: Int = process_message(parsed_message.text)
-      response
-    }
-    else {
-        200
-      }
+    val parsed_message = receive_message(request.text)
+    val response: Int = process_message(parsed_message.text)
+    response
   }
 
   // For when I want to make the bot send a message
@@ -53,11 +48,9 @@ object Main extends cask.MainRoutes {
     message_text
   }
 
-  // curl -X POST localhost:8080/pj1 -d '{"message_text": "asdf"}'
-  // requests.post(host + "/p1", data=Map("message_text" -> "foo"))
-  @cask.post(path="p1")
-  def p1(request: cask.Request): String = {
-    request.text
+  @cask.post(path=s"/${bot_token}")
+  def accept_webhook_check(request: cask.Request): Int = {
+    200
   }
 
   initialize()
