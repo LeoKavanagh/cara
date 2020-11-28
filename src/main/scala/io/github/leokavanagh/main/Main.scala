@@ -13,6 +13,8 @@ object Main extends cask.MainRoutes {
 
   implicit val tel: Telegram = Telegram(base_url, bot_token, chat_id)
 
+  override def port: Int = 5000
+
   @cask.get(path="/")
   def hello(): String = {
     "Druid siar."
