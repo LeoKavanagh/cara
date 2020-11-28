@@ -48,9 +48,14 @@ object Main extends cask.MainRoutes {
     message_text
   }
 
-  @cask.post(path=s"/${bot_token}")
+  @cask.route(path=s"/${bot_token}", methods=Seq("get", "post"))
   def accept_webhook_check(request: cask.Request): Int = {
-    200
+    if (request.exchange.getRequestMethod.equalToString("post")) {
+		200
+	}
+    else {
+		200200
+	}
   }
 
   initialize()
