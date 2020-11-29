@@ -1,8 +1,5 @@
 package io.github.leokavanagh.main
 
-//import sys._
-//import cask._
-//import ujson._
 import io.github.leokavanagh.cara.Cara._
 
 object Main extends cask.MainRoutes {
@@ -23,12 +20,18 @@ object Main extends cask.MainRoutes {
     "Druid siar."
   }
 
-  // For when I send a message to the bot in Telegram
-  @cask.post(path="/receive")
+  // suggested practice: Let the webhook url be the secret bot token
+  // so that others can't guess it and control the bot
+  @cask.route(path=s"/${bot_token}", methods=Seq("get", "post"))
   def receive_from_telegram(request: cask.Request): Int = {
-    val parsed_message = receive_message(request.text)
-    val response: Int = process_message(parsed_message.text)
-    response
+    if (request.exchange.getRequestMethod.equalToString("post")) {
+	  val parsed_message = receive_message(request.text)
+      val response: Int = process_message(parsed_message.text)
+      response
+	}
+    else {
+      200 // maybe this is confusing?
+	}
   }
 
   // For when I want to make the bot send a message
@@ -38,24 +41,6 @@ object Main extends cask.MainRoutes {
     println("in method msg")
     println(text)
     send_text(text)
-  }
-
-  // requests.post(host + "/pj1", data=ujson.Obj("message_text" -> "foo"))
-  // curl -X POST localhost:8080/pj1 -d '{"message_text": "asdf"}'
-  // Doesn't handle extra stuff turning up
-  @cask.postJson(path="/pj1")
-  def pj1(message_text: String): String = {
-    message_text
-  }
-
-  @cask.route(path=s"/${bot_token}", methods=Seq("get", "post"))
-  def accept_webhook_check(request: cask.Request): Int = {
-    if (request.exchange.getRequestMethod.equalToString("post")) {
-		200
-	}
-    else {
-		200200
-	}
   }
 
   initialize()
