@@ -36,6 +36,7 @@ object Cara {
     val first_word = msg.split(" ")(0).toLowerCase()
 
     first_word match {
+      case "wake" => send_text("What do you want?")
       case "weather" => send_text("call dublin-forecast")
       case "read" => send_text("call article-reader")
       case "remind" => Thread.sleep(1000); send_text(msg)

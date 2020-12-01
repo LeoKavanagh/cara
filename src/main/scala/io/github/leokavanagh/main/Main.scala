@@ -17,7 +17,7 @@ object Main extends cask.MainRoutes {
 
   @cask.get(path="/")
   def hello(): String = {
-    "Druid siar."
+    "Tá tú san áit micheart chun úsáid a bhaint asam."
   }
 
   // suggested practice: Let the webhook url be the secret bot token
@@ -36,7 +36,7 @@ object Main extends cask.MainRoutes {
 
   // For when I want to make the bot send a message
   // (as opposed to respond to one) using curl or whatever
-  @cask.postJson(path="/msg")
+  @cask.postJson(path=s"/msg${bot_token}")
   def msg(text: String)(implicit tel: Telegram): Int = {
     println("in method msg")
     println(text)
