@@ -25,7 +25,7 @@ object Main extends cask.MainRoutes {
   @cask.route(path=s"/${bot_token}", methods=Seq("get", "post"))
   def receive_from_telegram(request: cask.Request): Int = {
     if (request.exchange.getRequestMethod.equalToString("post")) {
-	  val parsed_message = receive_message(request.text)
+	  val parsed_message = receive_text(request.text)
       val response: Int = process_message(parsed_message.text)
       response
 	}

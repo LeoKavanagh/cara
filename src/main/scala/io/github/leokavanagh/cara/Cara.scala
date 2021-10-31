@@ -1,11 +1,14 @@
 package io.github.leokavanagh.cara
 
+import io.github.leokavanagh.cara.Bikes.findBikes
+
 object Cara {
 
   // the bot and chat ID shouldn't really be linked but I'm the only user so whatever
   case class Telegram(base_url: String, bot_token: String, chat_id: Int)
   case class ParsedMessage(text: String, chat_id: String)
 
+  
   def send_text(message_text: String)(implicit telegram: Telegram): Int = {
     val telegram_url: String = s"${telegram.base_url}${telegram.bot_token}"
 
@@ -20,7 +23,7 @@ object Cara {
     response.statusCode
   }
 
-  def receive_message(request_text: String): ParsedMessage = {
+  def receive_text(request_text: String): ParsedMessage = {
     val uj_msg = ujson.read(request_text)("message")
     // only doing this because I know what fields I want
 
@@ -32,14 +35,14 @@ object Cara {
     parsed_msg
   }
 
+
   def process_message(msg: String)(implicit telegram: Telegram): Int = {
     val first_word = msg.split(" ")(0).toLowerCase()
 
     first_word match {
       case "wake" => send_text("What do you want?")
       case "weather" => send_text("call dublin-forecast")
-      case "read" => send_text("call article-reader")
-      case "remind" => Thread.sleep(1000); send_text(msg)
+      case "bikes" => send_text(findBikes())
       case _ => send_text(s"I can't do ${first_word} yet. This is if-statement AI")
     }
   }
