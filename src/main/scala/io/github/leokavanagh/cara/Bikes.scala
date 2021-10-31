@@ -8,8 +8,8 @@ object Bikes {
 
   case class Coord(latitude: Float, longitude: Float)
 
-  val home = Coord(sys.env(HOMELAT),
-                   sys.env(HOMELONG))
+  val home = Coord(sys.env("HOMELAT").toFloat,
+                   sys.env("HOMELONG").toFloat)
 
   // square roots are for losers
   def dist(c1: Coord, c2: Coord): Double = {
