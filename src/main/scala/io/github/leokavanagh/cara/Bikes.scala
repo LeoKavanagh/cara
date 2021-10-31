@@ -38,7 +38,10 @@ object Bikes {
       .map(x => DBData(
         Coord(x("latitude").str.toFloat, x("longitude").str.toFloat),
         x("available_bikes").num.toInt,
-        x("address").str)))
+        x("address").str))
+      .map(bike => (bike, distFromHome(bike.loc)))
+      .sortBy(_._2)
+      map(_._1))
 
   def parseBleeperBikes(bResp: Response): Array[BleeperData] = {
     val zero = ujson.Value.JsonableInt(0)
@@ -50,7 +53,10 @@ object Bikes {
       .filter(_("vehicle_type") == zero)
       .map(x => BleeperData(
         Coord(x("latitude").num.toFloat, x("longitude").num.toFloat),
-        x("frame_id").num.toInt)))
+        x("frame_id").num.toInt))
+      .map(bike => (bike, distFromHome(bike.loc)))
+      .sortBy(_._2)
+      .map(_._1))
   }
 
 
@@ -61,11 +67,14 @@ object Bikes {
     val bleeperResp = requests.get(bleeper)
     val dubResp = requests.get(dublin)
 
+    // TODO: Ask for this number
     val n = 3
+
     val bleeperBikes = parseBleeperBikes(bleeperResp).take(n).map(_.loc).map(directionsToBike(home, _))
     val dublinBikes = parseDublinBikes(dubResp).take(n).map(_.loc).map(directionsToBike(home, _))
 
-    val bikes = (Array("Bikes:\n") ++ dublinBikes ++ bleeperBikes).mkString("\n * ")
+    // TODO: Replace this monstrosity with proper Markdown
+    val bikes = (Array("Dublin Bikes:\n") ++ dublinBikes ++ Array("\nBleeper Bikes:\n") ++ bleeperBikes).mkString("\n * ")
     bikes
   }
 

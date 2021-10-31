@@ -42,7 +42,7 @@ object Cara {
     first_word match {
       case "wake" => send_text("What do you want?")
       case "weather" => send_text("call dublin-forecast")
-      case "bikes" => send_text(findBikes())
+      case "bikes" => send_text(findBikes())  // TODO: ask for location
       case _ => send_text(s"I can't do ${first_word} yet. This is if-statement AI")
     }
   }
